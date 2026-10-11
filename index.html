@@ -3,65 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Office</title>
+<title>My Shop - Billing System</title>
 <style>
-*{box-sizing:border-box;font-family:sans-serif}
+*{box-sizing:border-box;font-family:Inter,sans-serif}
 body{margin:0;background:#f1f5f9}
-header{background:#0f172a;color:#fff;padding:12px 18px;display:flex;justify-content:space-between}
-.tabs{display:flex;gap:6px;padding:8px;background:#e2e8f0}
-.tab{padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:6px}
-.tab.active{background:#0f172a;color:#fff}
-table{border-collapse:collapse;width:100%;background:#fff}
-td,th{border:1px solid #cbd5e1;min-width:90px;height:28px;padding:2px 4px}
+header{background:#0f172a;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+header input{background:transparent;border:1px dashed #334155;color:white;padding:6px 10px;border-radius:6px;font-size:18px;font-weight:bold;width:220px}
+.container{max-width:900px;margin:12px auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.tabs{display:flex;background:#e2e8f0;padding:8px;gap:6px}
+.tab{padding:8px 14px;background:white;border-radius:6px;cursor:pointer;border:1px solid #cbd5e1}
+.tab.active{background:#0f172a;color:white}
+.content{padding:16px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #e2e8f0;padding:8px;text-align:left}
 th{background:#f8fafc}
-#doc{display:none;padding:12px}
-#docBox{width:100%;height:70vh;border:1px solid #cbd5e1;background:#fff;padding:12px;border-radius:8px}
+td input{width:100%;border:none;outline:none;padding:4px}
+.total-box{background:#f8fafc;padding:12px;border-radius:8px;text-align:right;margin-top:10px;font-size:18px}
+.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:bold}
+.btn-black{background:#0f172a;color:white}
+.btn-green{background:#16a34a;color:white}
+.btn-red{background:#ef4444;color:white}
+#docBox{width:100%;height:50vh;border:1px solid #cbd5e1;border-radius:8px;padding:10px}
+@media print{.tabs,header button,.no-print{display:none} body{background:white}}
 </style>
 </head>
 <body>
-<header><b>📊 My Office</b><span style="font-size:12px">Auto Save ON ✓</span></header>
+<header>
+<input id="shopName" value="Sukhitha Shop" onchange="saveShop()">
+<span><button class="btn" style="background:white;color:black" onclick="window.print()">🖨️ Print Bill</button></span>
+</header>
+
+<div class="container">
 <div class="tabs">
-<div class="tab active" id="t1" onclick="showSheet()">Excel Sheet</div>
-<div class="tab" id="t2" onclick="showDoc()">Word Doc</div>
-<button onclick="downloadCSV()">💾 Download</button>
+<div class="tab active" onclick="showTab('bill',this)">🧾 Billing</div>
+<div class="tab" onclick="showTab('stock',this)">📦 Stock Sheet</div>
+<div class="tab" onclick="showTab('doc',this)">📝 Notes</div>
 </div>
+
+<div id="billTab" class="content">
+<div style="display:flex;gap:8px;margin-bottom:10px" class="no-print">
+<input id="custName" placeholder="Customer Name" style="flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:6px">
+<input id="billNo" placeholder="Bill No: 001" style="width:120px;padding:8px;border:1px solid #cbd5e1;border-radius:6px">
+</div>
+<table id="billTable">
+<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>
+</table>
+<button class="btn btn-black no-print" onclick="addItem()" style="margin-top:10px">+ Add Item</button>
+<div class="total-box">Total: Rs. <span id="grandTotal">0.00</span></div>
+<div style="margin-top:12px" class="no-print">
+<button class="btn btn-green" onclick="saveBill()">💾 Save Bill</button>
+<button class="btn btn-red" onclick="clearBill()">Clear</button>
+</div>
+</div>
+
+<div id="stockTab" class="content" style="display:none">
+<h3>Stock / Excel Sheet</h3>
 <div id="sheetBox"></div>
-<div id="doc"><div id="docBox" contenteditable="true">Type your document here...</div></div>
+</div>
+
+<div id="docTab" class="content" style="display:none">
+<h3>Business Notes</h3>
+<div id="docBox" contenteditable="true">Write your daily sales notes here...</div>
+</div>
+</div>
+
 <script>
-let R=40,C=10;
-function build(){
-let h='<table><tr><th></th>';
-for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;
-h+='</tr>';
-for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`;
-for(let c=0;c<C;c++){h+=`<td contenteditable data-r="${r}" data-c="${c}">${localStorage.getItem('c-'+r+'-'+c)||''}</td>`;}
-h+='</tr>';}
-h+='</table>';
-document.getElementById('sheetBox').innerHTML=h;
-document.querySelectorAll('td').forEach(td=>{
-td.oninput=()=>localStorage.setItem('c-'+td.dataset.r+'-'+td.dataset.c,td.innerText)
+let shopNameEl=document.getElementById('shopName');
+shopNameEl.value=localStorage.getItem('shopName')||'Sukhitha Shop';
+function saveShop(){localStorage.setItem('shopName',shopNameEl.value)}
+
+let billTable=document.getElementById('billTable');
+let items=JSON.parse(localStorage.getItem('billItems')||'[{"name":"","qty":1,"price":0}]');
+function renderBill(){
+billTable.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';
+items.forEach((it,i)=>{
+billTable.innerHTML+=`<tr>
+<td><input value="${it.name}" oninput="items[${i}].name=this.value;calc()" placeholder="Item name"></td>
+<td><input type="number" value="${it.qty}" oninput="items[${i}].qty=this.value;calc()"></td>
+<td><input type="number" value="${it.price}" oninput="items[${i}].price=this.value;calc()"></td>
+<td>Rs.${(it.qty*it.price).toFixed(2)}</td>
+<td class="no-print"><button onclick="items.splice(${i},1);renderBill();calc()">X</button></td>
+</tr>`;
 });
 }
-function showSheet(){
-document.getElementById('sheetBox').style.display='block';
-document.getElementById('doc').style.display='none';
-document.getElementById('t1').classList.add('active');
-document.getElementById('t2').classList.remove('active');
+function calc(){
+let total=0; items.forEach(it=>total+=it.qty*it.price);
+document.getElementById('grandTotal').innerText=total.toFixed(2);
+localStorage.setItem('billItems',JSON.stringify(items));
 }
-function showDoc(){
-document.getElementById('sheetBox').style.display='none';
-document.getElementById('doc').style.display='block';
-document.getElementById('t2').classList.add('active');
-document.getElementById('t1').classList.remove('active');
+function addItem(){items.push({name:'',qty:1,price:0}); renderBill();}
+function clearBill(){items=[{name:'',qty:1,price:0}]; renderBill(); calc();}
+function saveBill(){calc(); alert('Bill Saved! Total: Rs.'+document.getElementById('grandTotal').innerText)}
+
+// Stock sheet
+let R=30,C=8, sheetBox=document.getElementById('sheetBox');
+function buildSheet(){
+let h='<table><tr><th></th>'; for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`; h+='</tr>';
+for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`; for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('s-'+r+'-'+c)||''}" oninput="localStorage.setItem('s-'+r+'-'+c,this.value)"></td>`; h+='</tr>';}
+h+='</table>'; sheetBox.innerHTML=h;
 }
-function downloadCSV(){
-let csv='';for(let r=0;r<R;r++){let row=[];for(let c=0;c<C;c++)row.push('"'+(localStorage.getItem('c-'+r+'-'+c)||'')+'"');csv+=row.join(',')+'\n';}
-let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv]));a.download='MyOffice.csv';a.click();
+function showTab(id,el){
+document.getElementById('billTab').style.display=id=='bill'?'block':'none';
+document.getElementById('stockTab').style.display=id=='stock'?'block':'none';
+document.getElementById('docTab').style.display=id=='doc'?'block':'none';
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+if(id=='stock')buildSheet();
 }
-let d=document.getElementById('docBox');
-d.innerHTML=localStorage.getItem('doc')||d.innerHTML;
-d.oninput=()=>localStorage.setItem('doc',d.innerHTML);
-build();
+let docBox=document.getElementById('docBox');
+docBox.innerHTML=localStorage.getItem('notes')||docBox.innerHTML;
+docBox.oninput=()=>localStorage.setItem('notes',docBox.innerHTML);
+
+renderBill(); calc(); buildSheet();
 </script>
 </body>
 </html>
