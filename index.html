@@ -1,40 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Office</title>
-<link rel="stylesheet" href="https://unpkg.com/@univerjs/presets@0.10.8/lib/styles.css">
+<title>My Office - Sukhitha</title>
 <style>
-  html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; }
-  #app { height:100vh; width:100vw; }
-  #loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#fff; z-index:9999; }
+*{box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{margin:0;background:#f1f5f9;height:100vh;display:flex;flex-direction:column}
+header{background:#0f172a;color:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:18px}
+.tabs{display:flex;gap:8px;background:#e2e8f0;padding:8px}
+.tab{padding:8px 16px;border-radius:8px;cursor:pointer;background:white;border:1px solid #cbd5e1}
+.tab.active{background:#0f172a;color:white}
+#sheet{flex:1;overflow:auto;background:white;display:none}
+#doc{flex:1;overflow:auto;background:white;display:none;padding:20px}
+#doc[contenteditable]{outline:none}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #cbd5e1;min-width:100px;height:28px;padding:4px}
+th{background:#f8fafc;position:sticky;top:0}
+td:focus{background:#eff6ff;outline:2px solid #3b82f6}
+.toolbar{display:flex;gap:8px;padding:8px;background:white;border-bottom:1px solid #e2e8f0}
+button{padding:6px 12px;border-radius:6px;border:1px solid #cbd5e1;background:white;cursor:pointer}
+#docContent{width:100%;height:70vh;border:1px solid #cbd5e1;padding:16px;border-radius:8px}
 </style>
 </head>
 <body>
-<div id="loading">Loading Office...</div>
-<div id="app"></div>
-<script type="importmap">
-{
-  "imports": {
-    "@univerjs/presets": "https://esm.sh/@univerjs/presets@0.10.8?external=react",
-    "@univerjs/preset-sheets-core": "https://esm.sh/@univerjs/preset-sheets-core@0.10.8?external=react",
-    "react": "https://esm.sh/react@18.3.1",
-    "react-dom": "https://esm.sh/react-dom@18.3.1"
-  }
+<header>
+<h1>📊 My Office - ranasingeisukhitha-max</h1>
+<span style="font-size:12px">Auto Saved ✓</span>
+</header>
+<div class="tabs">
+<div class="tab active" onclick="show('sheet',this)">Excel Sheet</div>
+<div class="tab" onclick="show('doc',this)">Word Doc</div>
+<button onclick="saveFile()">💾 Download</button>
+<button onclick="clearAll()">🗑️ Clear</button>
+</div>
+<div class="toolbar" id="sheetTools">
+<button onclick="addRow()">+ Row</button>
+<button onclick="addCol()">+ Column</button>
+</div>
+<div id="sheet"></div>
+<div id="doc">
+<h3>Word Document</h3>
+<div id="docContent" contenteditable="true">Type your document here...
+
+This is your personal Office System!
+- Excel like sheet saves automatically
+- Word doc also saves automatically
+- Click Download to get files
+</div>
+</div>
+<script>
+let rows=30, cols=10;
+let sheetEl=document.getElementById('sheet');
+function build(){
+let h='<table><tr><th></th>';
+for(let c=0;c<cols;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;
+h+='</tr>';
+for(let r=0;r<rows;r++){
+h+=`<tr><th>${r+1}</th>`;
+for(let c=0;c<cols;c++)h+=`<td contenteditable data-r="${r}" data-c="${c}">${localStorage.getItem(`cell-${r}-${c}`)||''}</td>`;
+h+='</tr>';
 }
-</script>
-<script type="module">
-import { createUniver } from '@univerjs/presets';
-import { UniverSheetsCorePreset } from '@univerjs/preset-sheets-core';
-
-const { univerAPI } = createUniver({
-  locale: 'en-US',
-  presets: [[UniverSheetsCorePreset, { container: 'app' }]],
-});
-
-univerAPI.createUniverSheet({ name: 'My Office Sheet' });
-document.getElementById('loading').style.display='none';
+h+='</table>'; sheetEl.innerHTML=h;
+sheetEl.querySelectorAll('td').forEach(td=>{
+td.addEventListener('input',()=>{localStorage.setItem(`cell-${td.dataset.r}-${td.dataset.c}`,td.innerText)})
+})
+}
+function show(id,el){
+document.getElementById('sheet').style.display=id=='sheet'?'block':'none';
+document.getElementById('doc').style.display=id=='doc'?'block':'none';
+document.getElementById('sheetTools').style.display=id=='sheet'?'flex':'none';
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+}
+function addRow(){rows++;build()} function addCol(){cols++;build()}
+function saveFile(){
+let csv=''; for(let r=0;r<rows;r++){let row=[]; for(let c=0;c<cols;c++)row.push(localStorage.getItem(`cell-${r}-${c}`)||''); csv+=row.join(',')+'\n'}
+let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='my-office-sheet.csv'; a.click();
+}
+function clearAll(){if(confirm('Clear all data?')){localStorage.clear(); build(); document.getElementById('docContent').innerText='';}}
+// Doc save
+let docEl=document.getElementById('docContent');
+docEl.innerHTML=localStorage.getItem('my-doc')||docEl.innerHTML;
+docEl.addEventListener('input',()=>localStorage.setItem('my-doc',docEl.innerHTML));
+build(); show('sheet',document.querySelector('.tab'));
 </script>
 </body>
 </html>
