@@ -1,42 +1,144 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sukhitha Shop - Billing</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Shop - Billing</title>
 <style>
-*{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f1f5f9}
+*{box-sizing:border-box;font-family:Inter,sans-serif}
+body{margin:0;background:#f1f5f9}
 header{background:#0f172a;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-header input{background:#1e293b;border:1px dashed #475569;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;width:180px}
-.box{max-width:900px;margin:10px auto;background:#fff;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.08);overflow:hidden}
+header input{background:#1e293b;border:1px dashed #475569;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;width:180px;font-size:16px}
+.box{max-width:900px;margin:10px auto;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);overflow:hidden}
 .tabs{display:flex;gap:6px;background:#e2e8f0;padding:8px}
-.tab{padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer}
+.tab{padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer;font-weight:600}
 .tab.active{background:#0f172a;color:#fff}
 .content{padding:14px}
-table{width:100%;border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:7px}th{background:#f8fafc}
-td input{width:100%;border:none;outline:none}
-.total{text-align:right;background:#f8fafc;padding:12px;border-radius:8px;margin-top:10px;font-size:19px;font-weight:bold}
-.btn{padding:8px 14px;border-radius:8px;border:none;font-weight:bold;cursor:pointer}
-.bk{background:#0f172a;color:#fff}.gn{background:#16a34a;color:#fff}.rd{background:#ef4444;color:#fff}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:8px;text-align:left}th{background:#f8fafc}
+td input{width:100%;border:none;outline:none;padding:4px;font-size:14px}
+.total{text-align:right;background:#f8fafc;padding:14px;border-radius:10px;margin-top:12px;font-size:20px;font-weight:bold}
+.btn{padding:9px 14px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;margin-right:6px}
+.bk{background:#0f172a;color:#fff}.gn{background:#16a34a;color:#fff}.rd{background:#ef4444;color:#fff}.wa{background:#25D366;color:#fff}
 @media print{.no-print{display:none} body{background:#fff} .box{box-shadow:none}}
-</style></head><body>
-<header><input id="shopName" value="Sukhitha Shop"><button class="btn" style="background:#fff;color:#000" onclick="window.print()">🖨️ Print</button></header>
+#sheet{overflow:auto}
+#sheet table{width:700px}
+</style>
+</head>
+<body>
+<header>
+<input id="shopName" value="Sukhitha Shop">
+<button class="btn" style="background:#fff;color:#000" onclick="window.print()">🖨️ Print Bill</button>
+</header>
+
 <div class="box">
-<div class="tabs"><div class="tab active" onclick="show('bill',this)">🧾 Billing</div><div class="tab" onclick="show('stock',this)">📦 Stock</div></div>
+<div class="tabs">
+<div class="tab active" onclick="show('bill',this)">🧾 Billing</div>
+<div class="tab" onclick="show('stock',this)">📦 Stock Sheet</div>
+<div class="tab" onclick="show('notes',this)">📝 Notes</div>
+</div>
+
 <div id="bill" class="content">
-<div class="no-print" style="display:flex;gap:8px;margin-bottom:10px"><input id="cust" placeholder="Customer Name" style="flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:6px"><input id="bno" value="Bill: 001" style="width:110px;padding:8px;border:1px solid #cbd5e1;border-radius:6px"></div>
+<div class="no-print" style="display:flex;gap:8px;margin-bottom:10px">
+<input id="cust" placeholder="Customer Name" style="flex:1;padding:9px;border:1px solid #cbd5e1;border-radius:7px">
+<input id="bno" placeholder="Bill No: 001" value="Bill No: 001" style="width:125px;padding:9px;border:1px solid #cbd5e1;border-radius:7px">
+</div>
+
 <table id="bt"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr></table>
+
 <button class="btn bk no-print" onclick="add()" style="margin-top:10px">+ Add Item</button>
 <div class="total">Total: Rs. <span id="gt">0.00</span></div>
-<div class="no-print" style="margin-top:10px;display:flex;gap:8px"><button class="btn gn" onclick="alert('Saved! Total Rs.'+document.getElementById('gt').innerText)">💾 Save</button><button class="btn rd" onclick="clearB()">Clear</button></div>
+
+<div class="no-print" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">
+<button class="btn gn" onclick="saveBill()">💾 Save Bill</button>
+<button class="btn wa" onclick="shareWA()">📲 Share on WhatsApp</button>
+<button class="btn rd" onclick="clearB()">Clear</button>
 </div>
-<div id="stock" class="content" style="display:none"><div id="sheet"></div></div>
 </div>
+
+<div id="stock" class="content" style="display:none">
+<h3 style="margin:0 0 10px">Stock Sheet</h3>
+<div id="sheet"></div>
+</div>
+
+<div id="notes" class="content" style="display:none">
+<h3 style="margin:0 0 10px">Business Notes</h3>
+<div id="docBox" contenteditable="true" style="min-height:200px;border:1px solid #cbd5e1;border-radius:8px;padding:12px;outline:none">Write daily sales, credit list here...
+Eg:
+2026-10-11 - Sales Rs. 5000
+Saman - Credit Rs. 500</div>
+</div>
+</div>
+
 <script>
-let shop=document.getElementById('shopName');shop.value=localStorage.getItem('shop')||'Sukhitha Shop';shop.onchange=()=>localStorage.setItem('shop',shop.value);
-let items=JSON.parse(localStorage.getItem('items')||'[{"n":"","q":1,"p":0}]');
+let shop=document.getElementById('shopName');
+shop.value=localStorage.getItem('shopName')||'Sukhitha Shop';
+shop.oninput=()=>localStorage.setItem('shopName',shop.value);
+
+let items=JSON.parse(localStorage.getItem('billItemsV2')||'[{"n":"","q":1,"p":0}]');
 let bt=document.getElementById('bt');
-function render(){bt.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';items.forEach((it,i)=>{bt.innerHTML+=`<tr><td><input placeholder="Rice" value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td><td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()"></td><td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()"></td><td>Rs.${(it.q*it.p).toFixed(2)}</td><td class="no-print"><button onclick="items.splice(${i},1);render();calc()">X</button></td></tr>`})}
-function calc(){let t=0;items.forEach(it=>t+=it.q*it.p);document.getElementById('gt').innerText=t.toFixed(2);localStorage.setItem('items',JSON.stringify(items))}
-function add(){items.push({n:"",q:1,p:0});render()}function clearB(){items=[{n:"",q:1,p:0}];render();calc()}
-function show(id,el){document.getElementById('bill').style.display=id=='bill'?'block':'none';document.getElementById('stock').style.display=id=='stock'?'block':'none';document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');if(id=='stock')build()}
-function build(){let R=30,C=6,h='<table><tr><th></th>';for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;h+='</tr>';for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`;for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('st-'+r+'-'+c)||''}" oninput="localStorage.setItem('st-'+r+'-'+c,this.value)"></td>`;h+='</tr>'}h+='</table>';document.getElementById('sheet').innerHTML=h}
-render();calc();build();
-</script></body></html>
+
+function render(){
+bt.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';
+items.forEach((it,i)=>{
+bt.innerHTML+=`<tr>
+<td><input placeholder="Item name" value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td>
+<td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()"></td>
+<td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()"></td>
+<td>Rs.${(Number(it.q)*Number(it.p)).toFixed(2)}</td>
+<td class="no-print"><button onclick="items.splice(${i},1);render();calc()" style="padding:4px 8px;border-radius:5px;border:1px solid #ccc">X</button></td>
+</tr>`;
+});
+}
+
+function calc(){
+let t=0; items.forEach(it=>{ t+=Number(it.q)*Number(it.p); });
+document.getElementById('gt').innerText=t.toFixed(2);
+localStorage.setItem('billItemsV2',JSON.stringify(items));
+}
+
+function add(){ items.push({n:"",q:1,p:0}); render(); }
+function clearB(){ if(confirm('Clear bill?')){ items=[{n:"",q:1,p:0}]; render(); calc(); } }
+function saveBill(){ calc(); alert('✅ Bill Saved! Total: Rs.'+document.getElementById('gt').innerText); }
+
+function shareWA(){
+calc();
+let cust=document.getElementById('cust').value||'Customer';
+let bno=document.getElementById('bno').value||'Bill No: 001';
+let total=document.getElementById('gt').innerText;
+let sname=document.getElementById('shopName').value;
+let msg=`*${sname}*%0A${bno}%0ACustomer: ${cust}%0A----------------%0A`;
+items.forEach(it=>{ if(it.n.trim()!==''){ msg+=`${it.n} x ${it.q} = Rs.${(it.q*it.p).toFixed(2)}%0A`; } });
+msg+=`----------------%0A*Total: Rs.${total}*%0A%0AThank you! 🙏`;
+window.open(`https://wa.me/?text=${msg}`,'_blank');
+}
+
+function show(id,el){
+document.getElementById('bill').style.display=id=='bill'?'block':'none';
+document.getElementById('stock').style.display=id=='stock'?'block':'none';
+document.getElementById('notes').style.display=id=='notes'?'block':'none';
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+el.classList.add('active');
+if(id=='stock') buildSheet();
+}
+
+function buildSheet(){
+let R=30,C=8,h='<table><tr><th></th>';
+for(let c=0;c<C;c++) h+=`<th>${String.fromCharCode(65+c)}</th>`;
+h+='</tr>';
+for(let r=0;r<R;r++){
+h+=`<tr><th>${r+1}</th>`;
+for(let c=0;c<C;c++) h+=`<td><input value="${localStorage.getItem('stock-'+r+'-'+c)||''}" oninput="localStorage.setItem('stock-'+r+'-'+c,this.value)"></td>`;
+h+='</tr>';
+}
+h+='</table>';
+document.getElementById('sheet').innerHTML=h;
+}
+
+let docBox=document.getElementById('docBox');
+docBox.innerHTML=localStorage.getItem('notesBox')||docBox.innerHTML;
+docBox.oninput=()=>localStorage.setItem('notesBox',docBox.innerHTML);
+
+render(); calc(); buildSheet();
+</script>
+</body>
+</html>
