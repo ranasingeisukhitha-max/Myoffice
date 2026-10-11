@@ -1,119 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Shop - Billing System</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sukhitha Shop - Billing</title>
 <style>
-*{box-sizing:border-box;font-family:Inter,sans-serif}
-body{margin:0;background:#f1f5f9}
-header{background:#0f172a;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
-header input{background:transparent;border:1px dashed #334155;color:white;padding:6px 10px;border-radius:6px;font-size:18px;font-weight:bold;width:220px}
-.container{max-width:900px;margin:12px auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-.tabs{display:flex;background:#e2e8f0;padding:8px;gap:6px}
-.tab{padding:8px 14px;background:white;border-radius:6px;cursor:pointer;border:1px solid #cbd5e1}
-.tab.active{background:#0f172a;color:white}
-.content{padding:16px}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #e2e8f0;padding:8px;text-align:left}
-th{background:#f8fafc}
-td input{width:100%;border:none;outline:none;padding:4px}
-.total-box{background:#f8fafc;padding:12px;border-radius:8px;text-align:right;margin-top:10px;font-size:18px}
-.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:bold}
-.btn-black{background:#0f172a;color:white}
-.btn-green{background:#16a34a;color:white}
-.btn-red{background:#ef4444;color:white}
-#docBox{width:100%;height:50vh;border:1px solid #cbd5e1;border-radius:8px;padding:10px}
-@media print{.tabs,header button,.no-print{display:none} body{background:white}}
-</style>
-</head>
-<body>
-<header>
-<input id="shopName" value="Sukhitha Shop" onchange="saveShop()">
-<span><button class="btn" style="background:white;color:black" onclick="window.print()">🖨️ Print Bill</button></span>
-</header>
-
-<div class="container">
-<div class="tabs">
-<div class="tab active" onclick="showTab('bill',this)">🧾 Billing</div>
-<div class="tab" onclick="showTab('stock',this)">📦 Stock Sheet</div>
-<div class="tab" onclick="showTab('doc',this)">📝 Notes</div>
+*{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f1f5f9}
+header{background:#0f172a;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+header input{background:#1e293b;border:1px dashed #475569;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;width:180px}
+.box{max-width:900px;margin:10px auto;background:#fff;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.08);overflow:hidden}
+.tabs{display:flex;gap:6px;background:#e2e8f0;padding:8px}
+.tab{padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer}
+.tab.active{background:#0f172a;color:#fff}
+.content{padding:14px}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:7px}th{background:#f8fafc}
+td input{width:100%;border:none;outline:none}
+.total{text-align:right;background:#f8fafc;padding:12px;border-radius:8px;margin-top:10px;font-size:19px;font-weight:bold}
+.btn{padding:8px 14px;border-radius:8px;border:none;font-weight:bold;cursor:pointer}
+.bk{background:#0f172a;color:#fff}.gn{background:#16a34a;color:#fff}.rd{background:#ef4444;color:#fff}
+@media print{.no-print{display:none} body{background:#fff} .box{box-shadow:none}}
+</style></head><body>
+<header><input id="shopName" value="Sukhitha Shop"><button class="btn" style="background:#fff;color:#000" onclick="window.print()">🖨️ Print</button></header>
+<div class="box">
+<div class="tabs"><div class="tab active" onclick="show('bill',this)">🧾 Billing</div><div class="tab" onclick="show('stock',this)">📦 Stock</div></div>
+<div id="bill" class="content">
+<div class="no-print" style="display:flex;gap:8px;margin-bottom:10px"><input id="cust" placeholder="Customer Name" style="flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:6px"><input id="bno" value="Bill: 001" style="width:110px;padding:8px;border:1px solid #cbd5e1;border-radius:6px"></div>
+<table id="bt"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr></table>
+<button class="btn bk no-print" onclick="add()" style="margin-top:10px">+ Add Item</button>
+<div class="total">Total: Rs. <span id="gt">0.00</span></div>
+<div class="no-print" style="margin-top:10px;display:flex;gap:8px"><button class="btn gn" onclick="alert('Saved! Total Rs.'+document.getElementById('gt').innerText)">💾 Save</button><button class="btn rd" onclick="clearB()">Clear</button></div>
 </div>
-
-<div id="billTab" class="content">
-<div style="display:flex;gap:8px;margin-bottom:10px" class="no-print">
-<input id="custName" placeholder="Customer Name" style="flex:1;padding:8px;border:1px solid #cbd5e1;border-radius:6px">
-<input id="billNo" placeholder="Bill No: 001" style="width:120px;padding:8px;border:1px solid #cbd5e1;border-radius:6px">
+<div id="stock" class="content" style="display:none"><div id="sheet"></div></div>
 </div>
-<table id="billTable">
-<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>
-</table>
-<button class="btn btn-black no-print" onclick="addItem()" style="margin-top:10px">+ Add Item</button>
-<div class="total-box">Total: Rs. <span id="grandTotal">0.00</span></div>
-<div style="margin-top:12px" class="no-print">
-<button class="btn btn-green" onclick="saveBill()">💾 Save Bill</button>
-<button class="btn btn-red" onclick="clearBill()">Clear</button>
-</div>
-</div>
-
-<div id="stockTab" class="content" style="display:none">
-<h3>Stock / Excel Sheet</h3>
-<div id="sheetBox"></div>
-</div>
-
-<div id="docTab" class="content" style="display:none">
-<h3>Business Notes</h3>
-<div id="docBox" contenteditable="true">Write your daily sales notes here...</div>
-</div>
-</div>
-
 <script>
-let shopNameEl=document.getElementById('shopName');
-shopNameEl.value=localStorage.getItem('shopName')||'Sukhitha Shop';
-function saveShop(){localStorage.setItem('shopName',shopNameEl.value)}
-
-let billTable=document.getElementById('billTable');
-let items=JSON.parse(localStorage.getItem('billItems')||'[{"name":"","qty":1,"price":0}]');
-function renderBill(){
-billTable.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';
-items.forEach((it,i)=>{
-billTable.innerHTML+=`<tr>
-<td><input value="${it.name}" oninput="items[${i}].name=this.value;calc()" placeholder="Item name"></td>
-<td><input type="number" value="${it.qty}" oninput="items[${i}].qty=this.value;calc()"></td>
-<td><input type="number" value="${it.price}" oninput="items[${i}].price=this.value;calc()"></td>
-<td>Rs.${(it.qty*it.price).toFixed(2)}</td>
-<td class="no-print"><button onclick="items.splice(${i},1);renderBill();calc()">X</button></td>
-</tr>`;
-});
-}
-function calc(){
-let total=0; items.forEach(it=>total+=it.qty*it.price);
-document.getElementById('grandTotal').innerText=total.toFixed(2);
-localStorage.setItem('billItems',JSON.stringify(items));
-}
-function addItem(){items.push({name:'',qty:1,price:0}); renderBill();}
-function clearBill(){items=[{name:'',qty:1,price:0}]; renderBill(); calc();}
-function saveBill(){calc(); alert('Bill Saved! Total: Rs.'+document.getElementById('grandTotal').innerText)}
-
-// Stock sheet
-let R=30,C=8, sheetBox=document.getElementById('sheetBox');
-function buildSheet(){
-let h='<table><tr><th></th>'; for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`; h+='</tr>';
-for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`; for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('s-'+r+'-'+c)||''}" oninput="localStorage.setItem('s-'+r+'-'+c,this.value)"></td>`; h+='</tr>';}
-h+='</table>'; sheetBox.innerHTML=h;
-}
-function showTab(id,el){
-document.getElementById('billTab').style.display=id=='bill'?'block':'none';
-document.getElementById('stockTab').style.display=id=='stock'?'block':'none';
-document.getElementById('docTab').style.display=id=='doc'?'block':'none';
-document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-if(id=='stock')buildSheet();
-}
-let docBox=document.getElementById('docBox');
-docBox.innerHTML=localStorage.getItem('notes')||docBox.innerHTML;
-docBox.oninput=()=>localStorage.setItem('notes',docBox.innerHTML);
-
-renderBill(); calc(); buildSheet();
-</script>
-</body>
-</html>
+let shop=document.getElementById('shopName');shop.value=localStorage.getItem('shop')||'Sukhitha Shop';shop.onchange=()=>localStorage.setItem('shop',shop.value);
+let items=JSON.parse(localStorage.getItem('items')||'[{"n":"","q":1,"p":0}]');
+let bt=document.getElementById('bt');
+function render(){bt.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';items.forEach((it,i)=>{bt.innerHTML+=`<tr><td><input placeholder="Rice" value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td><td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()"></td><td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()"></td><td>Rs.${(it.q*it.p).toFixed(2)}</td><td class="no-print"><button onclick="items.splice(${i},1);render();calc()">X</button></td></tr>`})}
+function calc(){let t=0;items.forEach(it=>t+=it.q*it.p);document.getElementById('gt').innerText=t.toFixed(2);localStorage.setItem('items',JSON.stringify(items))}
+function add(){items.push({n:"",q:1,p:0});render()}function clearB(){items=[{n:"",q:1,p:0}];render();calc()}
+function show(id,el){document.getElementById('bill').style.display=id=='bill'?'block':'none';document.getElementById('stock').style.display=id=='stock'?'block':'none';document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');if(id=='stock')build()}
+function build(){let R=30,C=6,h='<table><tr><th></th>';for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;h+='</tr>';for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`;for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('st-'+r+'-'+c)||''}" oninput="localStorage.setItem('st-'+r+'-'+c,this.value)"></td>`;h+='</tr>'}h+='</table>';document.getElementById('sheet').innerHTML=h}
+render();calc();build();
+</script></body></html>
