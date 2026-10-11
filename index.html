@@ -2,17 +2,39 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Office</title>
-<link rel="stylesheet" href="https://unpkg.com/@univerjs/presets/lib/styles.css"/>
-<style>html,body,#app{height:100%;margin:0}</style>
+<link rel="stylesheet" href="https://unpkg.com/@univerjs/presets@0.10.8/lib/styles.css">
+<style>
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; }
+  #app { height:100vh; width:100vw; }
+  #loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#fff; z-index:9999; }
+</style>
 </head>
 <body>
+<div id="loading">Loading Office...</div>
 <div id="app"></div>
+<script type="importmap">
+{
+  "imports": {
+    "@univerjs/presets": "https://esm.sh/@univerjs/presets@0.10.8?external=react",
+    "@univerjs/preset-sheets-core": "https://esm.sh/@univerjs/preset-sheets-core@0.10.8?external=react",
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom": "https://esm.sh/react-dom@18.3.1"
+  }
+}
+</script>
 <script type="module">
-import { createUniver } from 'https://esm.sh/@univerjs/presets@0.10.0';
-import { UniverSheetsCorePreset } from 'https://esm.sh/@univerjs/preset-sheets-core@0.10.0?external=@univerjs/presets';
-const { univerAPI } = createUniver({ presets: [[UniverSheetsCorePreset, {container:'app'}]] });
-univerAPI.createUniverSheet({name:'My Sheet'});
+import { createUniver } from '@univerjs/presets';
+import { UniverSheetsCorePreset } from '@univerjs/preset-sheets-core';
+
+const { univerAPI } = createUniver({
+  locale: 'en-US',
+  presets: [[UniverSheetsCorePreset, { container: 'app' }]],
+});
+
+univerAPI.createUniverSheet({ name: 'My Office Sheet' });
+document.getElementById('loading').style.display='none';
 </script>
 </body>
 </html>
