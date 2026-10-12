@@ -1,144 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Shop - Billing</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MyOffice - 3 Language Business App</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;font-family:Inter,sans-serif}
-body{margin:0;background:#f1f5f9}
-header{background:#0f172a;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
-header input{background:#1e293b;border:1px dashed #475569;color:#fff;padding:6px 10px;border-radius:6px;font-weight:bold;width:180px;font-size:16px}
-.box{max-width:900px;margin:10px auto;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);overflow:hidden}
-.tabs{display:flex;gap:6px;background:#e2e8f0;padding:8px}
-.tab{padding:8px 14px;background:#fff;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer;font-weight:600}
-.tab.active{background:#0f172a;color:#fff}
-.content{padding:14px}
-table{width:100%;border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:8px;text-align:left}th{background:#f8fafc}
-td input{width:100%;border:none;outline:none;padding:4px;font-size:14px}
-.total{text-align:right;background:#f8fafc;padding:14px;border-radius:10px;margin-top:12px;font-size:20px;font-weight:bold}
-.btn{padding:9px 14px;border-radius:8px;border:none;font-weight:bold;cursor:pointer;margin-right:6px}
-.bk{background:#0f172a;color:#fff}.gn{background:#16a34a;color:#fff}.rd{background:#ef4444;color:#fff}.wa{background:#25D366;color:#fff}
-@media print{.no-print{display:none} body{background:#fff} .box{box-shadow:none}}
-#sheet{overflow:auto}
-#sheet table{width:700px}
+*{box-sizing:border-box;font-family:Inter,Noto Sans Sinhala,Noto Sans Tamil,sans-serif}
+body{margin:0;background:#0f172a;color:#fff;overflow-x:hidden}
+.anim{animation:fadeUp.6s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.glass{background:rgba(255,255,255,.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.15)}
+.btn{padding:12px 18px;border-radius:12px;border:none;font-weight:800;cursor:pointer;transition:.2s}
+.btn:active{transform:scale(.97)}
+.primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 8px 20px rgba(34,197,94,.3)}
+.card{background:#fff;color:#0f172a;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.2);transition:.3s}
+.card:hover{transform:translateY(-4px)}
+.path-card{cursor:pointer;border:2px solid transparent}
+.path-card:hover{border-color:#22c55e;transform:translateY(-6px) scale(1.02)}
+.lang{padding:6px 10px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#fff;cursor:pointer;font-size:12px}
+.lang.active{background:#fff;color:#000}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #e2e8f0;outline:none}
+.header{padding:16px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:20px;letter-spacing:-.5px}
+.dot{width:10px;height:10px;background:#22c55e;border-radius:50%;display:inline-block;animation:float 2s infinite}
+.page{max-width:1000px;margin:0 auto;padding:16px}
+.hide{display:none}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:8px}th{background:#f8fafc;color:#000}
+td input{border:none;padding:4px}
 </style>
 </head>
 <body>
-<header>
-<input id="shopName" value="Sukhitha Shop">
-<button class="btn" style="background:#fff;color:#000" onclick="window.print()">🖨️ Print Bill</button>
-</header>
 
-<div class="box">
-<div class="tabs">
-<div class="tab active" onclick="show('bill',this)">🧾 Billing</div>
-<div class="tab" onclick="show('stock',this)">📦 Stock Sheet</div>
-<div class="tab" onclick="show('notes',this)">📝 Notes</div>
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page anim" style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+<div style="width:100%;max-width:420px">
+<div class="glass" style="border-radius:24px;padding:24px;text-align:center">
+<div style="font-size:48px;animation:float 3s infinite">🏪</div>
+<h1 style="margin:10px 0 4px;font-size:28px;font-weight:900">MyOffice</h1>
+<p id="loginSub" style="opacity:.7;margin:0 0 16px">ඔබේ ව්‍යාපාරය ඩිජිටල් කරන්න</p>
+
+<div style="display:flex;gap:6px;justify-content:center;margin-bottom:16px">
+<button class="lang active" onclick="setLang('si',this)">සිංහල</button>
+<button class="lang" onclick="setLang('ta',this)">தமிழ்</button>
+<button class="lang" onclick="setLang('en',this)">English</button>
 </div>
 
-<div id="bill" class="content">
-<div class="no-print" style="display:flex;gap:8px;margin-bottom:10px">
-<input id="cust" placeholder="Customer Name" style="flex:1;padding:9px;border:1px solid #cbd5e1;border-radius:7px">
-<input id="bno" placeholder="Bill No: 001" value="Bill No: 001" style="width:125px;padding:9px;border:1px solid #cbd5e1;border-radius:7px">
+<div style="display:flex;flex-direction:column;gap:10px;text-align:left">
+<input id="uName" placeholder="නම / Name / பெயர்">
+<input id="uPhone" placeholder="Phone / දුරකථන / தொலைபேசி">
+<input id="uEmail" placeholder="Gmail (optional)">
+<button class="btn primary" onclick="doLogin()" style="width:100%;margin-top:8px" id="loginBtn">🚀 ඇතුල් වන්න - Start</button>
+<p style="text-align:center;opacity:.5;font-size:11px;margin:8px 0 0">Gmail හෝ Phone වලින් Login වන්න - Secure & Free</p>
 </div>
-
-<table id="bt"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr></table>
-
-<button class="btn bk no-print" onclick="add()" style="margin-top:10px">+ Add Item</button>
-<div class="total">Total: Rs. <span id="gt">0.00</span></div>
-
-<div class="no-print" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">
-<button class="btn gn" onclick="saveBill()">💾 Save Bill</button>
-<button class="btn wa" onclick="shareWA()">📲 Share on WhatsApp</button>
-<button class="btn rd" onclick="clearB()">Clear</button>
+</div>
 </div>
 </div>
 
-<div id="stock" class="content" style="display:none">
-<h3 style="margin:0 0 10px">Stock Sheet</h3>
-<div id="sheet"></div>
+<!-- PATH SELECT -->
+<div id="pathPage" class="page hide anim">
+<div class="header"><div class="logo"><span class="dot"></span> MyOffice</div><div id="userBadge" class="glass" style="padding:6px 12px;border-radius:20px;font-size:12px"></div></div>
+<h2 id="pathTitle" style="font-size:26px;font-weight:900;margin:10px 0">ඔබට ගැලපෙන පාර තෝරන්න</h2>
+<p id="pathDesc" style="opacity:.7;margin:0 0 16px">ඔබ තෝරන දේ අනුව App එක හැදෙනවා</p>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+<div class="card path-card" onclick="selectPath('shop')">
+<div style="font-size:36px">🏪</div>
+<h3 id="p1t">පොඩි සිල්ලර කඩේ</h3>
+<p id="p1d" style="opacity:.7;font-size:13px;margin:6px 0 10px">Bill, ණය පොත, Stock, WhatsApp Share. ගමේ කඩේට Perfect!</p>
+<span class="btn" style="background:#0f172a;color:#fff;width:100%">Open →</span>
+</div>
+<div class="card path-card" onclick="selectPath('business')">
+<div style="font-size:36px">💼</div>
+<h3 id="p2t">Business Management</h3>
+<p id="p2d" style="opacity:.7;font-size:13px;margin:6px 0 10px">Sales Report, Profit, Customer Data, Professional Billing.</p>
+<span class="btn" style="background:#0f172a;color:#fff;width:100%">Open →</span>
+</div>
+<div class="card path-card" onclick="selectPath('learn')">
+<div style="font-size:36px">🎓</div>
+<h3 id="p3t">ව්‍යාපාර ඉගෙන ගමු</h3>
+<p id="p3d" style="opacity:.7;font-size:13px;margin:6px 0 10px">Business Ideas, Marketing Tips, පොඩි මුදලින් Business පටන් ගන්න.</p>
+<span class="btn" style="background:#0f172a;color:#fff;width:100%">Learn →</span>
+</div>
+</div>
 </div>
 
-<div id="notes" class="content" style="display:none">
-<h3 style="margin:0 0 10px">Business Notes</h3>
-<div id="docBox" contenteditable="true" style="min-height:200px;border:1px solid #cbd5e1;border-radius:8px;padding:12px;outline:none">Write daily sales, credit list here...
-Eg:
-2026-10-11 - Sales Rs. 5000
-Saman - Credit Rs. 500</div>
+<!-- MAIN APP - SHOP -->
+<div id="shopPage" class="hide">
+<div style="background:#fff;color:#000;min-height:100vh">
+<div style="background:#0f172a;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+<input id="shopName" value="සුඛිතා වෙළඳසැල" style="background:#1e293b;border:1px dashed #475569;color:#fff;padding:7px 12px;border-radius:8px;font-weight:bold;width:190px">
+<button class="btn" style="background:#fff;color:#000;padding:8px 12px" onclick="goPath()">⬅️ Back</button>
+</div>
+<div style="max-width:1000px;margin:0 auto;padding:12px">
+<div style="display:flex;gap:6px;background:#e2e8f0;padding:8px;border-radius:12px;margin-bottom:10px;overflow:auto">
+<button class="btn tabBtn active" onclick="showTab('billTab',this)">🧾 බිල්</button>
+<button class="btn tabBtn" onclick="showTab('creditTab',this)">📒 ණය</button>
+<button class="btn tabBtn" onclick="showTab('stockTab',this)">📦 තොග</button>
+</div>
+<div id="billTab"><div style="display:flex;gap:8px;margin-bottom:8px"><input id="cust" placeholder="Customer"><input id="bno" value="Bill 001" style="width:120px"></div><table id="bt"></table><button class="btn" style="background:#0f172a;color:#fff;margin-top:8px" onclick="add()">+ Add</button><div style="text-align:right;background:#fef9c3;padding:12px;border-radius:10px;margin-top:10px;font-weight:900">Total: Rs.<span id="gt">0</span></div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn primary" onclick="shareWA()">📲 WhatsApp Share</button><button class="btn" style="background:#ef4444;color:#fff" onclick="clearB()">Clear</button></div></div>
+<div id="creditTab" class="hide"><div style="display:flex;gap:8px;margin-bottom:8px"><input id="crName" placeholder="Name"><input id="crAmt" type="number" placeholder="Rs"><button class="btn" style="background:#eab308" onclick="saveCredit()">+ Add</button></div><div id="creditList"></div></div>
+<div id="stockTab" class="hide"><div id="sheet" style="overflow:auto"></div></div>
+</div>
+</div>
+</div>
+
+<!-- LEARN PAGE -->
+<div id="learnPage" class="hide page anim">
+<div style="display:flex;justify-content:space-between;align-items:center"><h2>🎓 Business School</h2><button class="btn glass" onclick="goPath()">Back</button></div>
+<div style="display:grid;gap:12px;margin-top:12px">
+<div class="card"><h3>1. රු.5000 න් පටන් ගන්න Business 3ක්</h3><p style="opacity:.7">• Phone Cover Print • Homemade Kottu Mix Pack • Second Hand Clothes Wash & Sell</p></div>
+<div class="card"><h3>2. කඩේ Sales වැඩි කරන Trick</h3><p style="opacity:.7">WhatsApp Status එකේ දවසේ Offer එක දාන්න, ණය පොතෙන් මතක් කිරීමක් යවන්න.</p></div>
+<div class="card"><h3>3. Profit හදන හැටි</h3><p style="opacity:.7">ගන්න ගාන x 1.3 = විකුණන ගාන. උදා: Rs.100 ගත්ත නම් Rs.130 විකුණන්න.</p></div>
 </div>
 </div>
 
 <script>
-let shop=document.getElementById('shopName');
-shop.value=localStorage.getItem('shopName')||'Sukhitha Shop';
-shop.oninput=()=>localStorage.setItem('shopName',shop.value);
-
-let items=JSON.parse(localStorage.getItem('billItemsV2')||'[{"n":"","q":1,"p":0}]');
-let bt=document.getElementById('bt');
-
-function render(){
-bt.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th class="no-print">X</th></tr>';
-items.forEach((it,i)=>{
-bt.innerHTML+=`<tr>
-<td><input placeholder="Item name" value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td>
-<td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()"></td>
-<td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()"></td>
-<td>Rs.${(Number(it.q)*Number(it.p)).toFixed(2)}</td>
-<td class="no-print"><button onclick="items.splice(${i},1);render();calc()" style="padding:4px 8px;border-radius:5px;border:1px solid #ccc">X</button></td>
-</tr>`;
-});
+let lang='si';
+let dict={
+si:{sub:"ඔබේ ව්‍යාපාරය ඩිජිටල් කරන්න",login:"🚀 ඇතුල් වන්න - Start",pt:"ඔබට ගැලපෙන පාර තෝරන්න",pd:"ඔබ තෝරන දේ අනුව App එක හැදෙනවා",p1t:"පොඩි සිල්ලර කඩේ",p1d:"Bill, ණය පොත, Stock, WhatsApp Share. ගමේ කඩේට Perfect!",p2t:"Business Management",p3t:"ව්‍යාපාර ඉගෙන ගමු",p3d:"Business Ideas, Marketing Tips, පොඩි මුදලින් Business පටන් ගන්න."},
+ta:{sub:"உங்கள் வணிகத்தை டிஜிட்டல் ஆக்குங்கள்",login:"🚀 தொடங்கு - Start",pt:"உங்களுக்கு ஏற்ற பாதையை தேர்வு செய்யுங்கள்",pd:"நீங்கள் தேர்வு செய்வதற்கு ஏற்ப App மாறும்",p1t:"சிறு கடை",p1d:"Bill, கடன் புத்தகம், Stock. கிராம கடைக்கு சரியானது!",p2t:"Business Management",p3t:"வணிகம் கற்க",p3d:"Business Ideas, சிறு முதலீட்டில் தொழில் தொடங்க."},
+en:{sub:"Digitize Your Business",login:"🚀 Start Now",pt:"Choose Your Path",pd:"App changes based on what you choose",p1t:"Small Retail Shop",p1d:"Billing, Credit Book, Stock, WhatsApp Share. Perfect for village shops!",p2t:"Business Management",p3t:"Learn Business",p3d:"Business Ideas, Marketing Tips, Start with small money."}
+};
+function setLang(l,el){lang=l;document.querySelectorAll('.lang').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+let d=dict[l];document.getElementById('loginSub').innerText=d.sub;document.getElementById('loginBtn').innerText=d.login;
+if(document.getElementById('pathTitle')){document.getElementById('pathTitle').innerText=d.pt;document.getElementById('pathDesc').innerText=d.pd;document.getElementById('p1t').innerText=d.p1t;document.getElementById('p1d').innerText=d.p1d;document.getElementById('p2t').innerText=d.p2t;document.getElementById('p3t').innerText=d.p3t;document.getElementById('p3d').innerText=d.p3d;}
 }
-
-function calc(){
-let t=0; items.forEach(it=>{ t+=Number(it.q)*Number(it.p); });
-document.getElementById('gt').innerText=t.toFixed(2);
-localStorage.setItem('billItemsV2',JSON.stringify(items));
+function doLogin(){
+let name=document.getElementById('uName').value||'Sukhitha';
+let phone=document.getElementById('uPhone').value||'';
+if(!phone){alert('Phone Number එක දාන්න');return}
+localStorage.setItem('myoffice_user',JSON.stringify({name,phone,email:document.getElementById('uEmail').value,lang}));
+document.getElementById('loginPage').classList.add('hide');
+document.getElementById('pathPage').classList.remove('hide');
+document.getElementById('userBadge').innerText='👋 '+name+' | '+phone;
 }
-
-function add(){ items.push({n:"",q:1,p:0}); render(); }
-function clearB(){ if(confirm('Clear bill?')){ items=[{n:"",q:1,p:0}]; render(); calc(); } }
-function saveBill(){ calc(); alert('✅ Bill Saved! Total: Rs.'+document.getElementById('gt').innerText); }
-
-function shareWA(){
-calc();
-let cust=document.getElementById('cust').value||'Customer';
-let bno=document.getElementById('bno').value||'Bill No: 001';
-let total=document.getElementById('gt').innerText;
-let sname=document.getElementById('shopName').value;
-let msg=`*${sname}*%0A${bno}%0ACustomer: ${cust}%0A----------------%0A`;
-items.forEach(it=>{ if(it.n.trim()!==''){ msg+=`${it.n} x ${it.q} = Rs.${(it.q*it.p).toFixed(2)}%0A`; } });
-msg+=`----------------%0A*Total: Rs.${total}*%0A%0AThank you! 🙏`;
-window.open(`https://wa.me/?text=${msg}`,'_blank');
+function selectPath(p){
+localStorage.setItem('myoffice_path',p);
+if(p=='learn'){document.getElementById('pathPage').classList.add('hide');document.getElementById('learnPage').classList.remove('hide');}
+else{ // shop & business same app, business shows profit extra
+document.getElementById('pathPage').classList.add('hide');document.getElementById('shopPage').classList.remove('hide');initShop();}
 }
-
-function show(id,el){
-document.getElementById('bill').style.display=id=='bill'?'block':'none';
-document.getElementById('stock').style.display=id=='stock'?'block':'none';
-document.getElementById('notes').style.display=id=='notes'?'block':'none';
-document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-el.classList.add('active');
-if(id=='stock') buildSheet();
+function goPath(){document.getElementById('shopPage').classList.add('hide');document.getElementById('learnPage').classList.add('hide');document.getElementById('pathPage').classList.remove('hide');}
+function showTab(id,el){['billTab','creditTab','stockTab'].forEach(x=>document.getElementById(x).classList.add('hide'));document.getElementById(id).classList.remove('hide');document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('active'));el.classList.add('active'); if(id=='stockTab')buildSheet(); if(id=='creditTab')renderCredit();}
+let items=JSON.parse(localStorage.getItem('itemsFinal')||'[{"n":"","q":1,"p":0}]');
+let credits=JSON.parse(localStorage.getItem('creditsFinal')||'[]');
+function initShop(){render();calc();renderCredit();buildSheet();
+let shop=document.getElementById('shopName');shop.value=localStorage.getItem('shopFinal')||'සුඛිතා වෙළඳසැල';shop.oninput=()=>localStorage.setItem('shopFinal',shop.value);
 }
-
-function buildSheet(){
-let R=30,C=8,h='<table><tr><th></th>';
-for(let c=0;c<C;c++) h+=`<th>${String.fromCharCode(65+c)}</th>`;
-h+='</tr>';
-for(let r=0;r<R;r++){
-h+=`<tr><th>${r+1}</th>`;
-for(let c=0;c<C;c++) h+=`<td><input value="${localStorage.getItem('stock-'+r+'-'+c)||''}" oninput="localStorage.setItem('stock-'+r+'-'+c,this.value)"></td>`;
-h+='</tr>';
-}
-h+='</table>';
-document.getElementById('sheet').innerHTML=h;
-}
-
-let docBox=document.getElementById('docBox');
-docBox.innerHTML=localStorage.getItem('notesBox')||docBox.innerHTML;
-docBox.oninput=()=>localStorage.setItem('notesBox',docBox.innerHTML);
-
-render(); calc(); buildSheet();
+function render(){let bt=document.getElementById('bt');bt.innerHTML='<tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>X</th></tr>';items.forEach((it,i)=>{bt.innerHTML+=`<tr><td><input value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td><td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()"></td><td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()"></td><td>Rs.${(it.q*it.p).toFixed(2)}</td><td><button onclick="items.splice(${i},1);render();calc()">X</button></td></tr>`});}
+function calc(){let t=0;items.forEach(it=>t+=Number(it.q)*Number(it.p));document.getElementById('gt').innerText=t.toFixed(2);localStorage.setItem('itemsFinal',JSON.stringify(items));}
+function add(){items.push({n:"",q:1,p:0});render();}
+function clearB(){items=[{n:"",q:1,p:0}];render();calc();}
+function shareWA(){calc();let msg=`*${document.getElementById('shopName').value}*%0A`;items.forEach(it=>{if(it.n)msg+=`${it.n} x${it.q}=Rs.${(it.q*it.p).toFixed(2)}%0A`;});msg+=`Total Rs.${document.getElementById('gt').innerText}`;window.open(`https://wa.me/?text=${msg}`,'_blank');}
+function saveCredit(){let n=document.getElementById('crName').value;let a=Number(document.getElementById('crAmt').value);if(!n||!a)return;credits.push({n,a,d:new Date().toLocaleDateString()});localStorage.setItem('creditsFinal',JSON.stringify(credits));renderCredit();}
+function renderCredit(){let list=document.getElementById('creditList');list.innerHTML='';credits.forEach((c,i)=>{list.innerHTML+=`<div style="background:#fff;color:#000;padding:10px;border-radius:10px;margin-bottom:6px;display:flex;justify-content:space-between"><span><b>${c.n}</b> Rs.${c.a} <small>${c.d}</small></span><button onclick="credits.splice(${i},1);localStorage.setItem('creditsFinal',JSON.stringify(credits));renderCredit()" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:4px 8px">Paid</button></div>`});}
+function buildSheet(){let R=25,C=6,h='<table style="width:600px;background:#fff;color:#000"><tr><th></th>';for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;h+='</tr>';for(let r=0;r<R;r++){h+=`<tr><th>${r+1}</th>`;for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('stF-'+r+'-'+c)||''}" oninput="localStorage.setItem('stF-'+r+'-'+c,this.value)"></td>`;h+='</tr>';}h+='</table>';document.getElementById('sheet').innerHTML=h;}
+// auto login
+let u=JSON.parse(localStorage.getItem('myoffice_user')||'null');
+if(u){document.getElementById('loginPage').classList.add('hide');document.getElementById('pathPage').classList.remove('hide');document.getElementById('userBadge').innerText='👋 '+u.name; setLang(u.lang||'si',document.querySelector('.lang'));}
 </script>
 </body>
 </html>
