@@ -1,107 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MyOffice Super App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Office - Business Management</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-*{box-sizing:border-box;font-family:sans-serif}
-body{margin:0;background:#0f172a;color:#fff}
-.page{max-width:1100px;margin:0 auto;padding:12px;min-height:100vh}
-.card{background:#fff;color:#000;border-radius:16px;padding:14px;margin-bottom:10px}
-.btn{padding:10px 14px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
-.primary{background:#22c55e;color:#fff}
-input{padding:10px;border-radius:8px;border:1px solid #ddd;margin-bottom:6px;color:#000}
-.lang{padding:6px 10px;border-radius:20px;border:1px solid #555;background:#1e293b;color:#fff;margin:2px;cursor:pointer}
-.lang.active{background:#fff;color:#000}
-.hide{display:none!important}
-.tabs{display:flex;gap:6px;background:#e2e8f0;padding:6px;border-radius:12px;margin-bottom:10px;overflow:auto}
-.tab{padding:8px 12px;background:#fff;border-radius:8px;cursor:pointer;color:#000;font-weight:700;border:1px solid #cbd5e1;white-space:nowrap}
-.tab.active{background:#0f172a;color:#fff}
-table{border-collapse:collapse}th,td{border:1px solid #e2e8f0;padding:6px}th{background:#f8fafc}
-td input{border:none;width:100%;padding:4px}
+body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f172a,#1e3a8a,#0f172a);min-height:100vh;overflow-x:hidden}
+.bg-animate{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;overflow:hidden}
+.circle{position:absolute;border-radius:50%;background:rgba(255,215,0,0.1);animation:float 10s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+.login-box{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:20px;padding:35px;box-shadow:0 20px 60px rgba(0,0,0,0.4);max-width:380px;margin:80px auto;border:1px solid gold}
+.btn-gold{background:linear-gradient(135deg,#fbbf24,#d97706);color:#000;font-weight:bold;border:none;padding:12px 20px;border-radius:10px;width:100%;cursor:pointer;transition:0.3s}
+.btn-gold:hover{transform:scale(1.03);box-shadow:0 5px 20px rgba(251,191,36,0.5)}
+.input{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;margin:8px 0;box-sizing:border-box}
+.dashboard{display:none;padding:20px}
+.card{background:rgba(255,255,255,0.95);border-radius:15px;padding:20px;margin:15px 0;box-shadow:0 10px 30px rgba(0,0,0,0.2);animation:slideIn 0.6s}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.notify{position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:15px 25px;border-radius:12px;display:none;animation:pop 0.5s;z-index:999}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
 </style>
 </head>
 <body>
-
-<div id="loginPage" class="page" style="display:flex;align-items:center;justify-content:center">
-<div style="width:100%;max-width:380px;background:rgba(255,255,255,.08);padding:24px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,.2)">
-<div style="font-size:50px">🏪</div><h1>MyOffice</h1><p style="opacity:.7">ඔබේ ව්‍යාපාරය ඩිජිටල් කරන්න</p>
-<div><button class="lang active" onclick="setLang('si',this)">සිංහල</button><button class="lang" onclick="setLang('ta',this)">தமிழ்</button><button class="lang" onclick="setLang('en',this)">English</button></div>
-<input id="uName" placeholder="නම / Name" style="width:100%;margin-top:10px"><input id="uPhone" placeholder="Phone" style="width:100%"><input id="uEmail" placeholder="Gmail" style="width:100%">
-<button class="btn primary" onclick="doLogin()" style="width:100%;margin-top:10px">🚀 ඇතුල් වන්න</button>
-</div>
+<div class="bg-animate">
+<div class="circle" style="width:200px;height:200px;top:10%;left:10%"></div>
+<div class="circle" style="width:300px;height:300px;top:60%;left:70%;animation-delay:2s"></div>
+<div class="circle" style="width:150px;height:150px;top:30%;left:80%;animation-delay:4s"></div>
 </div>
 
-<div id="pathPage" class="page hide">
-<h2>ඔබට ගැලපෙන පාර තෝරන්න</h2>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:16px">
-<div class="card" onclick="openShop()" style="cursor:pointer;border:2px solid #22c55e"><h3>🏪 පොඩි සිල්ලර කඩේ</h3><p>Bill + ණය පොත + Sheet + WhatsApp</p><button class="btn primary">Open →</button></div>
-<div class="card" onclick="openShop()" style="cursor:pointer"><h3>💼 Business Management</h3><p>Sales + Profit Report + Sheet</p><button class="btn" style="background:#0f172a;color:#fff">Open →</button></div>
-<div class="card" onclick="openLearn()" style="cursor:pointer"><h3>🎓 ව්‍යාපාර ඉගෙන ගමු</h3><p>Business Ideas & Tips</p><button class="btn" style="background:#0f172a;color:#fff">Learn →</button></div>
+<div id="loginPage">
+<div class="login-box">
+<h2 style="text-align:center;color:#1e3a8a">🔒 My Office Login</h2>
+<input id="loginNum" class="input" placeholder="Login Number / Phone Number">
+<input id="loginPass" class="input" type="password" placeholder="Password" style="display:none">
+<input id="newPass" class="input" type="password" placeholder="අලුත් Password එකක් හදන්න" style="display:none">
+<input id="confirmPass" class="input" type="password" placeholder="Password නැවත දාන්න" style="display:none">
+<button onclick="handleLogin()" class="btn-gold" id="loginBtn">Login / ඇතුලුවන්න</button>
+<p style="text-align:center;margin-top:15px;font-size:13px">පලවෙනි වතාවට නම් Phone No එක දාලා Enter කරන්න</p>
+<div id="adminCreate" style="margin-top:20px;border-top:1px dashed #ccc;padding-top:15px;display:none">
+<h4>Owner - අලුත් කෙනෙක් Register කිරීම</h4>
+<input id="regName" class="input" placeholder="Customer ගේ නම">
+<input id="regPhone" class="input" placeholder="Login Number (Phone)">
+<button onclick="registerUser()" class="btn-gold" style="background:#1e3a8a;color:white">Register කරන්න</button>
 </div>
-</div>
-
-<div id="shopPage" class="hide" style="background:#f1f5f9;color:#000;min-height:100vh">
-<div style="background:#0f172a;color:#fff;padding:12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10">
-<input id="shopName" value="සුඛිත වෙළඳසැල (RSB)" style="width:180px;background:#1e293b;color:#fff;border:1px dashed #555">
-<button class="btn" style="background:#fff;color:#000;padding:6px 12px" onclick="goBack()">⬅️ Back</button>
-</div>
-<div style="max-width:1100px;margin:0 auto;padding:12px">
-<div class="tabs">
-<div class="tab active" onclick="showTab('billTab',this)">🧾 බිල්</div>
-<div class="tab" onclick="showTab('creditTab',this)">📒 ණය පොත</div>
-<div class="tab" onclick="showTab('stockTab',this)">📊 Sheet (Excel වගේ)</div>
-<div class="tab" onclick="showTab('notesTab',this)">📝 සටහන්</div>
-</div>
-
-<div id="billTab">
-<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap"><input id="cust" placeholder="Customer Name" style="flex:1"><input id="bno" value="Bill 001" style="width:120px"></div>
-<table id="bt" style="width:100%;background:#fff"></table>
-<button class="btn" style="background:#0f172a;color:#fff;margin-top:8px" onclick="add()">+ බඩු එකතු කරන්න</button>
-<div style="text-align:right;background:#fef9c3;padding:12px;border-radius:10px;margin-top:10px;font-weight:900;border:1px dashed #facc15">මුළු මුදල: Rs.<span id="gt">0.00</span></div>
-<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn primary" onclick="shareWA()">📲 WhatsApp යවන්න</button><button class="btn" style="background:#eab308" onclick="addToCredit()">📒 ණයට දාන්න</button><button class="btn" style="background:#ef4444;color:#fff" onclick="clearB()">Clear</button><button class="btn" style="background:#fff;border:1px solid #ddd" onclick="window.print()">🖨️ Print</button></div>
-</div>
-
-<div id="creditTab" class="hide">
-<h3>📒 ණය පොත</h3><div style="display:flex;gap:6px;margin-bottom:10px"><input id="crName" placeholder="නම" style="flex:1"><input id="crAmt" type="number" placeholder="Rs" style="width:110px"><button class="btn" style="background:#eab308" onclick="saveCredit()">+ එකතු</button></div><div id="creditList"></div>
-<div style="text-align:right;background:#fef3c7;padding:10px;border-radius:8px;margin-top:8px;font-weight:800">මුළු ණය: Rs.<span id="crTotal">0.00</span></div>
-</div>
-
-<div id="stockTab" class="hide">
-<h3>📊 Excel වගේ Sheet එක - අර කලින් එකම!</h3><p style="opacity:.7;font-size:13px">මෙතන ඔයාට ඕන දෙයක් ලියන්න පුලුවන්, Auto Save වෙනවා</p>
-<div id="sheet" style="overflow:auto;background:#fff;border-radius:10px;padding:6px"></div>
-</div>
-
-<div id="notesTab" class="hide"><h3>📝 දවසේ සටහන්</h3><div id="docBox" contenteditable="true" style="min-height:220px;background:#fff;border-radius:10px;padding:12px;border:1px solid #ddd;outline:none">අද විකුණුම්... </div></div>
-
 </div>
 </div>
 
-<div id="learnPage" class="page hide"><button class="btn" onclick="goBack()" style="background:#fff;color:#000">⬅️ Back</button><h2 style="margin-top:16px">🎓 Business School</h2><div class="card"><h3>රු.5000න් පටන් ගන්න Business 3ක්</h3><p>Phone Cover Print, Kottu Mix Pack, Second hand clothes</p></div><div class="card"><h3>Sales වැඩි කරන Trick</h3><p>දවසේ Offer එක WhatsApp Status දාන්න</p></div></div>
+<div id="dashboard" class="dashboard">
+<div class="card">
+<h2>Welcome <span id="userName"></span> 👋 <button onclick="logout()" style="float:right">Logout</button></h2>
+<p>Login Number: <b id="userPhone"></b></p>
+</div>
+
+<div class="card">
+<h3>📦 බඩු විකුණුම් / Excel Sheet</h3>
+<input id="itemName" class="input" placeholder="බඩුවේ නම">
+<input id="itemPrice" class="input" placeholder="මිල">
+<input id="custName" class="input" placeholder="ගත් කෙනාගේ නම">
+<button onclick="printAndNotify('excel')" class="btn-gold">🖨️ Print Bill + Message යවන්න</button>
+</div>
+
+<div class="card">
+<h3>📒 ණය පොත - Loan Book</h3>
+<input id="loanName" class="input" placeholder="ණය ගත් කෙනා">
+<input id="loanAmount" class="input" placeholder="ණය මුදල">
+<input id="loanDate" class="input" type="date">
+<button onclick="printAndNotify('loan')" class="btn-gold" style="background:linear-gradient(135deg,#10b981,#059669);color:white">🖨️ ණය පොත Print + Message</button>
+</div>
+</div>
+
+<div id="notify" class="notify">✅ Print Success! Message යැවුවා!</div>
 
 <script>
-function setLang(l,el){document.querySelectorAll('.lang').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');localStorage.setItem('lang',l);}
-function doLogin(){let n=document.getElementById('uName').value;let p=document.getElementById('uPhone').value;if(!n&&!p){alert('නම හෝ Phone එක දාන්න');return;}localStorage.setItem('myoffice_user',JSON.stringify({name:n||'User',phone:p}));document.getElementById('loginPage').classList.add('hide');document.getElementById('pathPage').classList.remove('hide');}
-function openShop(){document.getElementById('pathPage').classList.add('hide');document.getElementById('shopPage').classList.remove('hide');init();}
-function openLearn(){document.getElementById('pathPage').classList.add('hide');document.getElementById('learnPage').classList.remove('hide');}
-function goBack(){document.getElementById('shopPage').classList.add('hide');document.getElementById('learnPage').classList.add('hide');document.getElementById('pathPage').classList.remove('hide');}
-function showTab(id,el){['billTab','creditTab','stockTab','notesTab'].forEach(x=>document.getElementById(x).classList.add('hide'));document.getElementById(id).classList.remove('hide');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');if(id=='stockTab')buildSheet();if(id=='creditTab')renderCredit();}
-let items=JSON.parse(localStorage.getItem('itemsFinal2')||'[{"n":"","q":1,"p":0}]');
-let credits=JSON.parse(localStorage.getItem('creditsFinal2')||'[]');
-function init(){render();calc();renderCredit();buildSheet();
-let shop=document.getElementById('shopName');shop.value=localStorage.getItem('shopFinal2')||'සුඛිතා වෙළඳසැල';shop.oninput=()=>localStorage.setItem('shopFinal2',shop.value);
-let docBox=document.getElementById('docBox');docBox.innerHTML=localStorage.getItem('notesFinal')||docBox.innerHTML;docBox.oninput=()=>localStorage.setItem('notesFinal',docBox.innerHTML);
+// Security Storage
+let users = JSON.parse(localStorage.getItem('myoffice_users') || '{}');
+
+function handleLogin(){
+ let phone = document.getElementById('loginNum').value.trim();
+ if(!phone){alert('Phone Number දාන්න');return}
+ 
+ // Owner login - ඔයාට
+ if(phone === '0770000000'){ // මේක ඔයාගේ number එකට වෙනස් කරන්න
+   document.getElementById('adminCreate').style.display='block';
+   alert('Owner Mode - අලුත් අය register කරන්න');
+   return;
+ }
+
+ if(!users[phone]){
+   // පලවෙනි පාර - password හදන්න
+   if(document.getElementById('newPass').style.display === 'none'){
+     document.getElementById('newPass').style.display='block';
+     document.getElementById('confirmPass').style.display='block';
+     document.getElementById('loginBtn').innerText='Password හදලා Login වෙන්න';
+     alert('පලවෙනි වතාවට නිසා අලුත් password එකක් හදන්න');
+     return;
+   } else {
+     let p1 = document.getElementById('newPass').value;
+     let p2 = document.getElementById('confirmPass').value;
+     if(p1.length < 4){alert('Password අවම 4ක් තියෙන්න ඕන');return}
+     if(p1 !== p2){alert('Passwords දෙක සමාන නෑ');return}
+     // Save first time password
+     users[phone] = {name: 'User '+phone, password: btoa(p1), phone: phone, created: new Date()};
+     localStorage.setItem('myoffice_users', JSON.stringify(users));
+     enterDashboard(phone);
+   }
+ } else {
+   // ඊලග පාර ඉදන් password එකෙන්
+   document.getElementById('loginPass').style.display='block';
+   let pass = document.getElementById('loginPass').value;
+   if(!pass){alert('Password දාන්න');return}
+   if(btoa(pass) === users[phone].password){
+     enterDashboard(phone);
+   } else {
+     alert('Password වැරදියි!');
+   }
+ }
 }
-function render(){let bt=document.getElementById('bt');bt.innerHTML='<tr><th>බඩුව</th><th>Qty</th><th>මිල</th><th>එකතුව</th><th>X</th></tr>';items.forEach((it,i)=>{bt.innerHTML+=`<tr><td><input placeholder="හාල්" value="${it.n}" oninput="items[${i}].n=this.value;calc()"></td><td><input type="number" value="${it.q}" oninput="items[${i}].q=this.value;calc()" style="width:60px"></td><td><input type="number" value="${it.p}" oninput="items[${i}].p=this.value;calc()" style="width:80px"></td><td>Rs.${(it.q*it.p).toFixed(2)}</td><td><button onclick="items.splice(${i},1);render();calc()">X</button></td></tr>`});}
-function calc(){let t=0;items.forEach(it=>t+=Number(it.q)*Number(it.p));document.getElementById('gt').innerText=t.toFixed(2);localStorage.setItem('itemsFinal2',JSON.stringify(items));}
-function add(){items.push({n:"",q:1,p:0});render();}
-function clearB(){if(confirm('Clear?')){items=[{n:"",q:1,p:0}];render();calc();}}
-function shareWA(){calc();let msg=`*${document.getElementById('shopName').value}*%0A`;items.forEach(it=>{if(it.n)msg+=`${it.n} x${it.q}=Rs.${(it.q*it.p).toFixed(2)}%0A`;});msg+=`Total Rs.${document.getElementById('gt').innerText}`;window.open(`https://wa.me/?text=${msg}`,'_blank');}
-function saveCredit(){let n=document.getElementById('crName').value;let a=Number(document.getElementById('crAmt').value);if(!n||!a)return alert('නම සහ මුදල දාන්න');credits.push({n,a,d:new Date().toLocaleDateString()});localStorage.setItem('creditsFinal2',JSON.stringify(credits));renderCredit();document.getElementById('crName').value='';document.getElementById('crAmt').value='';}
-function renderCredit(){let l=document.getElementById('creditList');let t=0;l.innerHTML='';credits.forEach((c,i)=>{t+=c.a;l.innerHTML+=`<div style="display:flex;justify-content:space-between;background:#fff;padding:10px;border-radius:10px;margin-bottom:6px;border:1px solid #fde68a"><div><b>${c.n}</b> - Rs.${c.a}<br><small>${c.d}</small></div><button onclick="credits.splice(${i},1);localStorage.setItem('creditsFinal2',JSON.stringify(credits));renderCredit()" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:6px 10px">ගෙවූවා</button></div>`});document.getElementById('crTotal').innerText=t.toFixed(2);}
-function addToCredit(){let total=document.getElementById('gt').innerText;let cust=document.getElementById('cust').value;if(!cust)return alert('Customer නම දාන්න');if(confirm(cust+' ට Rs.'+total+' ණයට දාන්නද?')){credits.push({n:cust,a:Number(total),d:new Date().toLocaleDateString()});localStorage.setItem('creditsFinal2',JSON.stringify(credits));renderCredit();alert('ණය පොතට දැමුවා!');}}
-function buildSheet(){let R=35,C=7,h='<table style="width:800px"><tr><th></th>';for(let c=0;c<C;c++)h+=`<th>${String.fromCharCode(65+c)}</th>`;h+='</tr>';for(let r=0;r<R;r++){h+=`<tr><th style="background:#f1f5f9">${r+1}</th>`;for(let c=0;c<C;c++)h+=`<td><input value="${localStorage.getItem('stFinal-'+r+'-'+c)||''}" oninput="localStorage.setItem('stFinal-'+r+'-'+c,this.value)" placeholder="${c==0?'බඩුව':''}"></td>`;h+='</tr>';}h+='</table>';document.getElementById('sheet').innerHTML=h;}
-let u=JSON.parse(localStorage.getItem('myoffice_user')||'null');if(u){document.getElementById('loginPage').classList.add('hide');document.getElementById('pathPage').classList.remove('hide');}
+
+function registerUser(){
+ let name = document.getElementById('regName').value;
+ let phone = document.getElementById('regPhone').value;
+ if(!name || !phone){alert('නම සහ phone දාන්න');return}
+ users[phone] = {name: name, password: null, phone: phone, created: new Date()};
+ localStorage.setItem('myoffice_users', JSON.stringify(users));
+ alert(name + ' Register කළා! එයාට පලවෙනි පාර login වෙලා password හදන්න කියන්න');
+}
+
+function enterDashboard(phone){
+ localStorage.setItem('currentUser', phone);
+ document.getElementById('loginPage').style.display='none';
+ document.getElementById('dashboard').style.display='block';
+ document.getElementById('userName').innerText = users[phone].name;
+ document.getElementById('userPhone').innerText = phone;
+}
+
+function printAndNotify(type){
+ let curPhone = localStorage.getItem('currentUser');
+ let cust = document.getElementById('custName').value || document.getElementById('loanName').value || 'Customer';
+ let price = document.getElementById('itemPrice').value || document.getElementById('loanAmount').value;
+ 
+ // 1. Print
+ let printWindow = window.open('', '', 'height=600,width=800');
+ let content = type==='excel' ? `<h1>My Office - Bill</h1><p>Customer: ${cust}</p><p>Item: ${document.getElementById('itemName').value}</p><p>Price: ${price}</p><p>Date: ${new Date().toLocaleString()}</p><p>By: ${curPhone}</p>` : `<h1>My Office - ණය පොත</h1><p>ණය ගත් අය: ${cust}</p><p>මුදල: ${price}</p><p>දිනය: ${document.getElementById('loanDate').value}</p>`;
+ printWindow.document.write(`<html><head><title>Print</title><style>body{font-family:sans-serif;padding:30px;border:2px solid gold}</style></head><body>${content}<br><button onclick="window.print()">Print කරන්න</button></body></html>`);
+ printWindow.document.close();
+ 
+ // 2. Animation + Message to login number
+ let notify = document.getElementById('notify');
+ notify.style.display='block';
+ notify.innerHTML=`✅ ${cust} ට බඩුව දුන්නා. ${curPhone} ට Message යනවා...`;
+ 
+ // WhatsApp Message යවන විදිය - login number එකට
+ let msg = type==='excel' ? `MyOffice: ${cust} ගෙන් රු.${price} බඩු විකිනීමක් Print කළා. By ${curPhone}` : `MyOffice: ${cust} ට රු.${price} ණය පොත Print කළා.`;
+ let waUrl = `https://wa.me/94${curPhone.slice(-9)}?text=${encodeURIComponent(msg)}`;
+ window.open(waUrl, '_blank');
+ 
+ setTimeout(()=>{notify.style.display='none'},4000);
+}
+
+function logout(){
+ localStorage.removeItem('currentUser');
+ location.reload();
+}
+
+// Auto check login
+window.onload = ()=>{
+ let cur = localStorage.getItem('currentUser');
+ if(cur && users[cur] && users[cur].password){enterDashboard(cur)}
+}
 </script>
 </body>
 </html>
